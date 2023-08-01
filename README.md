@@ -1,5 +1,5 @@
 # cicd
-
+## Нужно создать папки для value
 ```
  mkdir -p /data/docker/gitlab/var/opt/gitlab
 ```
