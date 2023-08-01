@@ -1,0 +1,72 @@
+version: '3.8'
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    hostname: 10.106.65.24
+    restart: unless-stopped
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        gitlab_rails['gitlab_shell_ssh_port'] = 8822
+    ports:
+      - "8000:80"
+      - "8822:22"
+    volumes:
+      - /data/docker/gitlab/etc/gitlab:/etc/gitlab
+      - /data/docker/gitlab/var/opt/gitlab:/var/opt/gitlab
+      - /data/docker/gitlab/var/log/gitlab:/var/log/gitlab
+    networks:
+      default:
+        ipv4_address: ${COMPOSE_PROJECT_NETWORK}.2
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:alpine
+    restart: unless-stopped
+    depends_on:
+      - gitlab
+    volumes:
+      - /data/docker/gitlab/etc/gitlab-runner:/etc/gitlab-runner
+      - /data/docker/gitlab/var/run/docker.sock:/var/run/docker.sock
+    networks:
+      default:
+        ipv4_address: ${COMPOSE_PROJECT_NETWORK}.3
+
+  teamcity:
+    container_name: teamcity
+    image: jetbrains/teamcity-server:latest
+    networks:
+      default:
+        ipv4_address: ${COMPOSE_PROJECT_NETWORK}.4
+  jenkins:
+    image: jenkins/jenkins:lts
+    privileged: true
+    user: root
+    ports:
+      - 8080:8080
+      - 50000:50000
+    container_name: jenkins
+    volumes:
+      - /jenkins:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      default:
+        ipv4_address: ${COMPOSE_PROJECT_NETWORK}.5
+  agent:
+    image: jenkins/ssh-agent:jdk11
+    privileged: true
+    user: root
+    container_name: agent
+    expose:
+      - 22
+    environment:
+      - JENKINS_AGENT_SSH_PUBKEY=ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDrSF2XICucxX//hz0PVgDVv3EisY6C99u9sA1QoZSdHuXW/H5i/1BT3CtUzBAsCOJxdSuadKfJZnNDEL98lmagU79tAgNjVgCnUyoKEkaEOz4J416cUsF/hR/rKUeRimcox6BncwixYsfmmcZMo1ImKWqdYIDu6TJV0RjhdpZyfn1RTxV0VXP1cn5yLO4aGz8ZCPLmvxVONykc0FLBVz3XgbpFW9xY3O4iaSrpoYn9Ce0m+Txx0lPYlm5bt6C2F6hp0LaBACsekAZz0oAXCKAel9gj27l8vXNj0eN2J8fxQdsTDtZ6Pnnd73ATfK114ceLDHL2VyV8m1KxD5Cm+zFgB7AfZ0xBsN+KGBtPqha7971lZSUvjKvRNXnPk3xrzwTPGKL8vnJOUidsx+6KzSTPB/sk8L9YsEy9i023KZTQMXTv0IrLp8Bbm3V4wWGsdfmviLMq3x2QMSMXlpE00alCar2eSah0425POSpyEtLFEDj2tURVjP+LmKroc8bOILc= egoebelbecker@zaku
+    networks:
+      default:
+        ipv4_address: ${COMPOSE_PROJECT_NETWORK}.6
+networks:
+  default:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: ${COMPOSE_PROJECT_NETWORK}.0/16
+          gateway: ${COMPOSE_PROJECT_NETWORK}.1
