@@ -30,6 +30,7 @@ services:
   php-fpm:
     container_name: php_fpm_${COMPOSE_PROJECT_NAME}
     image: php_fpm_${COMPOSE_PROJECT_NAME}
+    user: root
     build:
       args:
         user: $COMPOSE_USER_NAME

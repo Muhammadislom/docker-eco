@@ -33,3 +33,13 @@
 ```
  sudo gitlab-rake "gitlab:password:reset[root]"
 ```
+## SSH
+
+#### user
+```
+sshuser
+```
+#### password
+```
+docker
+```
