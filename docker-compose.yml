@@ -1,8 +1,8 @@
-version: '3.8'
+version: "3.8"
 services:
   gitlab:
     image: gitlab/gitlab-ce:latest
-    hostname: 10.106.65.24
+#    hostname: 10.106.65.24
     restart: unless-stopped
     environment:
       GITLAB_OMNIBUS_CONFIG: |
@@ -19,11 +19,12 @@ services:
         ipv4_address: ${COMPOSE_PROJECT_NETWORK}.2
 
   gitlab-runner:
-    image: gitlab/gitlab-runner:alpine
+    image: gitlab/gitlab-runner:latest
     restart: unless-stopped
     depends_on:
       - gitlab
     volumes:
+      - /data/docker/gitlab/home/gitlab-runner:/home/gitlab-runner
       - /data/docker/gitlab/etc/gitlab-runner:/etc/gitlab-runner
       - /data/docker/gitlab/var/run/docker.sock:/var/run/docker.sock
     networks:
