@@ -1,0 +1,12 @@
+stages:
+  - test
+
+prod_deploy:
+  stage: test
+  tags:
+    - test
+  only:
+    - main
+  when: manual
+  script:
+    - git pull https://gitlab-ci-token:${CI_JOB_TOKEN}@$PROJECT_PATH

@@ -1,0 +1,76 @@
+version: "3.8"
+services:
+
+  nginx-local:
+    container_name: nginx_local_${COMPOSE_PROJECT_NAME}
+    image: nginx:latest
+    working_dir: /app
+    volumes:
+      - ./src/local:/app
+      - ./docker/nginx/templates:/etc/nginx/templates
+    networks:
+      default:
+        ipv4_address: ${COMPOSE_PROJECT_NETWORK}.8
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    depends_on:
+      - php-fpm-local
+
+  mysql-local:
+    container_name: mysql_local_${COMPOSE_PROJECT_NAME}
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: $DB_DATABASE
+      MYSQL_USER: $DB_USERNAME
+      MYSQL_PASSWORD: $DB_PASSWORD
+    volumes:
+      - mysql:/var/lib/mysql
+    networks:
+      default:
+        ipv4_address: ${COMPOSE_PROJECT_NETWORK}.9
+
+  php-fpm-local:
+    container_name: php_fpm_local_${COMPOSE_PROJECT_NAME}
+    image: php_fpm_${COMPOSE_PROJECT_NAME}
+    user: root
+    build:
+      args:
+        user: $COMPOSE_USER_NAME
+        uid: $COMPOSE_USER_UID
+      context: ./
+      dockerfile: ./docker/php-fpm/Dockerfile
+    volumes:
+      - ./src/local:/app
+      - ./docker/php-fpm/php.ini:/usr/local/etc/php/php.ini
+      - ./docker/php-fpm/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+    networks:
+      default:
+        ipv4_address: ${COMPOSE_PROJECT_NETWORK}.10
+    depends_on:
+      - mysql-local
+
+  phpmyadmin-local:
+    container_name: phpmyadmin_local_${COMPOSE_PROJECT_NAME}
+    image: phpmyadmin:latest
+    environment:
+      PMA_HOST: mysql
+    #    PMA_ABSOLUTE_URI: pma
+    networks:
+      default:
+        ipv4_address: ${COMPOSE_PROJECT_NETWORK}.11
+    depends_on:
+      - mysql-local
+
+volumes:
+  mysql:
+    driver: local
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: ${COMPOSE_PROJECT_NETWORK}.0/16
+          gateway: ${COMPOSE_PROJECT_NETWORK}.1
