@@ -1,5 +1,6 @@
 version: "3.8"
 services:
+
   gitlab:
     image: gitlab/gitlab-ce:latest
 #    hostname: 10.106.65.24
@@ -37,6 +38,7 @@ services:
     networks:
       default:
         ipv4_address: ${COMPOSE_PROJECT_NETWORK}.4
+
   jenkins:
     image: jenkins/jenkins:lts
     privileged: true
@@ -51,6 +53,7 @@ services:
     networks:
       default:
         ipv4_address: ${COMPOSE_PROJECT_NETWORK}.5
+
   agent:
     image: jenkins/ssh-agent:jdk11
     privileged: true
@@ -63,6 +66,7 @@ services:
     networks:
       default:
         ipv4_address: ${COMPOSE_PROJECT_NETWORK}.6
+
 networks:
   default:
     driver: bridge

@@ -1,5 +1,6 @@
 version: "3.8"
 services:
+
   postgres:
     container_name: postgres_team
     image: postgres:14.5-alpine
@@ -17,7 +18,8 @@ services:
       - "8101:5432"
     networks:
       default:
-        ipv4_address: ${COMPOSE_PROJECT_NETWORK}.13
+        ipv4_address: ${COMPOSE_PROJECT_NETWORK}.7
+
 networks:
   default:
     driver: bridge
