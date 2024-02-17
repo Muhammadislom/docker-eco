@@ -29,14 +29,15 @@ RUN useradd -G www-data,root -u $uid -d /home/$user $user
 RUN mkdir -p /home/$user/.composer && \
     chown -R $user:$user /home/$user
 
+### GitLab Runner 15.11.0
 
-# GitLab Runner 15.11.0
 #RUN curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh" | bash
 #RUN apt-get install gitlab-runner
 #RUN apt-cache madison gitlab-runner
 #RUN apt-get install gitlab-runner=15.11.0
 
-## Shh install
+### Shh install
+
 #RUN apt-get update && apt-get install  openssh-server sudo -y
 ## Create a user “sshuser” and group “sshgroup”
 #RUN groupadd sshgroup && useradd -ms /bin/bash -g sshgroup sshuser
